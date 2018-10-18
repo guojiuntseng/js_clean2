@@ -4,21 +4,21 @@ export default class AddBudgetPresenter {
     budget = { month: '', amount: 0 }
     errors = { month: '', amount: '' }
     save(success) {
-        let monthValid, amountValid
+        let amountValid
         let validateMonthEmpty = () => this.budget.month === ''
         const MONTH_EMPTY_ERROR = 'Month cannot be empty';
         let validateMonthFormat = () => !(/^\d{4}-\d{2}$/g).test(this.budget.month)
         const MONTH_FORMAT_ERROR = 'Invalid month format';
-        if (validateMonthEmpty()) {
-            this.errors.month = MONTH_EMPTY_ERROR
-            monthValid = false
-        } else if (validateMonthFormat()) {
-            this.errors.month = MONTH_FORMAT_ERROR
-            monthValid = false
-        } else {
-            this.errors.month = ''
-            monthValid = true
-        }
+
+        let failure = [
+            {validate: validateMonthEmpty, error: MONTH_EMPTY_ERROR},
+            {validate: validateMonthFormat, error: MONTH_FORMAT_ERROR},
+            {validate: () => true, error: ''}
+        ].find(validation => validation.validate())
+
+        this.errors.month = failure.error;
+        let monthValid = this.errors.month === '';
+
         if (this.budget.amount === '') {
             this.errors.amount = 'Amount cannot be empty'
             amountValid = false
