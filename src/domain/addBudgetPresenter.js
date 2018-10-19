@@ -16,21 +16,23 @@ export default class AddBudgetPresenter {
         let validateAmountPositiveNumber = () => isNaN(parseInt(this.budget.amount, 10)) || this.budget.amount < 0
         const AMOUNT_NUMBER_ERROR = 'Invalid amount';
 
-        let failure = [
-            { validate: validateMonthEmpty, error: MONTH_EMPTY_ERROR },
-            { validate: validateMonthFormat, error: MONTH_FORMAT_ERROR },
-            { validate: () => true, error: '' }
-        ].find(validation => validation.validate())
+        let validations = {
+            month: [
+                { validate: validateMonthEmpty, error: MONTH_EMPTY_ERROR },
+                { validate: validateMonthFormat, error: MONTH_FORMAT_ERROR },
+                { validate: () => true, error: '' }
+            ],
+            amount: [
+                { validate: validateAmountEmpty, error: AMOUNT_EMPTY_ERROR },
+                { validate: validateAmountPositiveNumber, error: AMOUNT_NUMBER_ERROR },
+                { validate: () => true, error: '' }
+            ]
+        }
 
-        this.errors.month = failure.error;
-
-        failure = [
-            { validate: validateAmountEmpty, error: AMOUNT_EMPTY_ERROR },
-            { validate: validateAmountPositiveNumber, error: AMOUNT_NUMBER_ERROR },
-            { validate: () => true, error: '' }
-        ].find(validation => validation.validate())
-
-        this.errors.amount = failure.error
+        for (let field in validations) {
+            let failure = validations[field].find(validation => validation.validate())
+            this.errors[field] = failure.error;
+        }
 
         if (this.errors.month !== '' || !this.errors.amount !== '') {
             return
