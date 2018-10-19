@@ -17,14 +17,13 @@ export default class Validator {
         this.rules = rules;
     }
 
-    validate(data, callback) {
+    validate(data, success) {
         this.errors = {}
         for (let field in this.rules) {
             let failure = this.rules[field].find(validation => !validation.validate(this.data[field])) || { error: () => '' }
-            callback(field, failure.error(error))
             this.errors[field] = failure.error(field)
         }
-        return this.valid
+        this.valid && success()
     }
 
     get valid(){

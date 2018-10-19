@@ -13,17 +13,18 @@ export default class AddBudgetPresenter {
 
     save(success) {
         let amountValid
+
+        this.validator.validate(this.budget, () => {
+            let budgets = Api.getBudgets()
+            let existing = budgets && budgets.find(budget => budget.month === this.budget.month)
+            if (existing) {
+                Api.updateBudget(this.budget)
+            } else {
+                Api.addBudget(this.budget)
+            }
+            success()
+        })
         
-        if (!validator.validate(this.budget, (field, error) => this.errors[field] = error)) {
-            return
-        }
-        let budgets = Api.getBudgets()
-        let existing = budgets && budgets.find(budget => budget.month === this.budget.month)
-        if (existing) {
-            Api.updateBudget(this.budget)
-        } else {
-            Api.addBudget(this.budget)
-        }
-        success()
+        Object.assign(this.errors, this.validator.errors)
     }
 }
