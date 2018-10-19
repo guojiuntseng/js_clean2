@@ -5,8 +5,6 @@ export default class AddBudgetPresenter {
     errors = { month: '', amount: '' }
     save(success) {
         let amountValid
-        this.errors.amount = ''
-        let amountValid = true
 
         let validateMonthEmpty = () => this.budget.month === ''
         const MONTH_EMPTY_ERROR = 'Month cannot be empty';
@@ -27,13 +25,14 @@ export default class AddBudgetPresenter {
         let validateAmountPositiveNumber = () => isNaN(parseInt(this.budget.amount, 10)) || this.budget.amount < 0
         const AMOUNT_NUMBER_ERROR = 'Invalid amount';
 
-        if (validateAmountEmpty()) {
-            this.errors.amount = AMOUNT_EMPTY_ERROR
-            amountValid = false
-        } else if (validateAmountPositiveNumber()) {
-            this.errors.amount = AMOUNT_NUMBER_ERROR
-            amountValid = false
-        } 
+        failure = [
+            { validate: validateAmountEmpty, error: AMOUNT_EMPTY_ERROR },
+            { validate: validateAmountPositiveNumber, error: AMOUNT_NUMBER_ERROR },
+            { validate: () => true, error: '' }
+        ].find(validation => validation.validate())
+        
+        this.errors.amount = failure.error
+        let amountValid = this.errors.amount === ''
 
         if (!monthValid || !amountValid) {
             return
